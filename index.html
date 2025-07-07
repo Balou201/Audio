@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Nettoyeur de Voix IA</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      background: #121212;
+      color: white;
+      text-align: center;
+      padding: 2em;
+    }
+
+    input, select, button {
+      margin: 0.5em;
+      padding: 0.5em;
+      font-size: 1em;
+    }
+
+    button {
+      background: #1db954;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #17a442;
+    }
+  </style>
+</head>
+<body>
+  <h1>🧠 Nettoyeur de Voix IA</h1>
+  <form id="upload-form" enctype="multipart/form-data">
+    <input type="file" name="audio" accept="audio/wav" required />
+    <select name="preset">
+      <option value="">Aucun preset</option>
+      <option value="radio">Radio</option>
+      <option value="podcast">Podcast</option>
+      <option value="asmr">ASMR</option>
+    </select>
+    <button type="submit">Nettoyer</button>
+  </form>
+  <audio id="result-audio" controls style="margin-top:1em; display:none;"></audio>
+
+  <script>
+    const form = document.getElementById('upload-form');
+    const audioElem = document.getElementById('result-audio');
+
+    form.addEventListener('submit', async e => {
+      e.preventDefault();
+
+      const formData = new FormData(form);
+      const response = await fetch('/process', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (response.ok) {
+        const blob = await response.blob();
+        const url = URL.createObjectURL(blob);
+        audioElem.src = url;
+        audioElem.style.display = 'block';
+
+        // Auto download
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'voix_nettoyee.wav';
+        a.click();
+      } else {
+        alert('Erreur lors du nettoyage.');
+      }
+    });
+  </script>
+</body>
+</html>
